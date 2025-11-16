@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_dashboard/weather_service.dart';
+import 'package:weather_dashboard/services/weather_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:math';
 
@@ -79,7 +79,7 @@ class WeatherPage extends StatefulWidget {
 
 class _WeatherPageState extends State<WeatherPage> {
   final TextEditingController _indexController =
-      TextEditingController(text: '194174B');
+      TextEditingController(text: '224112A');
 
   final WeatherService _weatherService = WeatherService();
 
@@ -955,4 +955,4 @@ class GridPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}2
+}
