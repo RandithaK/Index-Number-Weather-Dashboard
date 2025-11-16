@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_dashboard/weather_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:math';
 
 void main() {
   runApp(const WeatherApp());
@@ -386,6 +388,26 @@ class _WeatherPageState extends State<WeatherPage> {
 
   Widget _buildMapPlaceholder(ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
+    final hasCoordinates = _latitude != null && _longitude != null;
+    
+    String osmUrl = '';
+    String staticMapUrl = '';
+    
+    if (hasCoordinates) {
+      final lat = double.tryParse(_latitude!.replaceAll('°', '')) ?? 0.0;
+      final lon = double.tryParse(_longitude!.replaceAll('°', '')) ?? 0.0;
+      osmUrl = 'https://www.openstreetmap.org/?mlat=$lat&mlon=$lon#map=12/$lat/$lon';
+      
+      // Using tile.openstreetmap.org with a simple static view
+      // Calculate tile coordinates for zoom level 12
+      final zoom = 10;
+      final x = ((lon + 180) / 360 * (1 << zoom)).floor();
+      final y = ((1 - log(tan(lat * pi / 180) + 1 / cos(lat * pi / 180)) / pi) / 2 * (1 << zoom)).floor();
+      
+      // Using OSM tile server for a static map view
+      staticMapUrl = 'https://tile.openstreetmap.org/$zoom/$x/$y.png';
+    }
+    
     return Card(
       elevation: 0,
       shadowColor: Colors.transparent,
@@ -401,34 +423,151 @@ class _WeatherPageState extends State<WeatherPage> {
                     fontWeight: FontWeight.w600,
                     color: theme.textTheme.bodyLarge?.color)),
             const SizedBox(height: 12),
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                color: isDarkMode
-                    ? const Color(0xFF1F2937)
-                    : const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
+            GestureDetector(
+              onTap: hasCoordinates
+                  ? () async {
+                      final uri = Uri.parse(osmUrl);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    }
+                  : null,
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
                   color: isDarkMode
-                      ? Colors.white.withOpacity(0.1)
-                      : Colors.black.withOpacity(0.05),
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFF9FAFB),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDarkMode
+                        ? Colors.white.withOpacity(0.1)
+                        : Colors.black.withOpacity(0.05),
+                  ),
                 ),
-              ),
-              child: Center(
-                child: Text('Map Placeholder',
-                    style: TextStyle(
-                        color: theme.textTheme.bodySmall?.color
-                            ?.withOpacity(0.4),
-                        fontSize: 13)),
+                child: hasCoordinates
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Stack(
+                          children: [
+                            // Display OpenStreetMap tile
+                            Center(
+                              child: Image.network(
+                                staticMapUrl,
+                                width: double.infinity,
+                                height: 200,
+                                fit: BoxFit.cover,
+                                headers: {
+                                  'User-Agent': 'WeatherDashboardApp/1.0',
+                                },
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                              loadingProgress.expectedTotalBytes!
+                                          : null,
+                                      color: isDarkMode
+                                          ? const Color(0xFFC4B5FD)
+                                          : const Color(0xFF7C3AED),
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  // Fallback: Show coordinates-based map representation
+                                  return _buildMapFallback(theme);
+                                },
+                              ),
+                            ),
+                            // Location marker overlay
+                            Center(
+                              child: Icon(
+                                Icons.location_on,
+                                size: 48,
+                                color: Colors.red.shade600,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 4,
+                                    color: Colors.black.withOpacity(0.5),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Overlay badge
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.7),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.touch_app,
+                                        size: 12, color: Colors.white),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Tap to Open',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 10),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.map_outlined,
+                              size: 48,
+                              color: theme.textTheme.bodySmall?.color
+                                  ?.withOpacity(0.3),
+                            ),
+                            const SizedBox(height: 8),
+                            Text('Map will appear after fetching weather',
+                                style: TextStyle(
+                                    color: theme.textTheme.bodySmall?.color
+                                        ?.withOpacity(0.4),
+                                    fontSize: 13)),
+                          ],
+                        ),
+                      ),
               ),
             ),
             const SizedBox(height: 8),
             TextButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.open_in_new, size: 14, color: isDarkMode ? const Color(0xFFC4B5FD) : const Color(0xFF7C3AED)),
+              onPressed: hasCoordinates
+                  ? () async {
+                      final uri = Uri.parse(osmUrl);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    }
+                  : null,
+              icon: Icon(Icons.open_in_new,
+                  size: 14,
+                  color: hasCoordinates
+                      ? (isDarkMode
+                          ? const Color(0xFFC4B5FD)
+                          : const Color(0xFF7C3AED))
+                      : theme.textTheme.bodySmall?.color?.withOpacity(0.3)),
               label: Text('Open in OpenStreetMap',
                   style: TextStyle(
-                      color: isDarkMode ? const Color(0xFFC4B5FD) : const Color(0xFF7C3AED),
+                      color: hasCoordinates
+                          ? (isDarkMode
+                              ? const Color(0xFFC4B5FD)
+                              : const Color(0xFF7C3AED))
+                          : theme.textTheme.bodySmall?.color?.withOpacity(0.3),
                       fontSize: 13,
                       fontWeight: FontWeight.w500)),
               style: TextButton.styleFrom(
@@ -439,6 +578,76 @@ class _WeatherPageState extends State<WeatherPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMapFallback(ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final lat = double.tryParse(_latitude!.replaceAll('°', '')) ?? 0.0;
+    final lon = double.tryParse(_longitude!.replaceAll('°', '')) ?? 0.0;
+    
+    return Container(
+      width: double.infinity,
+      height: 200,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDarkMode
+              ? [Color(0xFF1F2937), Color(0xFF374151)]
+              : [Color(0xFFE0E7FF), Color(0xFFC7D2FE)],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Grid pattern for map-like appearance
+          CustomPaint(
+            size: Size(double.infinity, 200),
+            painter: GridPainter(isDarkMode: isDarkMode),
+          ),
+          // Coordinates display
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.location_on,
+                  size: 64,
+                  color: Colors.red.shade600,
+                ),
+                SizedBox(height: 8),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        '${lat.toStringAsFixed(2)}°, ${lon.toStringAsFixed(2)}°',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Tap to view full map',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -616,7 +825,7 @@ class _WeatherPageState extends State<WeatherPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Done by ${(_studentIndex ?? _indexController.text).replaceAll(RegExp(r'[^0-9]'), '')}',
+            'Done by 224112A',
             style: TextStyle(
                 color: theme.textTheme.bodySmall?.color?.withOpacity(0.5),
                 fontSize: 12),
@@ -710,3 +919,40 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 }
+
+// Custom painter for grid background in map fallback
+class GridPainter extends CustomPainter {
+  final bool isDarkMode;
+
+  GridPainter({required this.isDarkMode});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = (isDarkMode ? Colors.white : Colors.black).withOpacity(0.1)
+      ..strokeWidth = 1;
+
+    const spacing = 30.0;
+
+    // Draw vertical lines
+    for (double i = 0; i < size.width; i += spacing) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i, size.height),
+        paint,
+      );
+    }
+
+    // Draw horizontal lines
+    for (double i = 0; i < size.height; i += spacing) {
+      canvas.drawLine(
+        Offset(0, i),
+        Offset(size.width, i),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}2

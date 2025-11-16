@@ -5,22 +5,16 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0' # Broadened SDK compatibility
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
   
-  # Using DIO http client
-  dio: ^5.4.3+1 # Or latest version
-
-  # Keep shared_preferences for caching
+  dio: ^5.4.3+1
   shared_preferences: ^2.2.3 
-  
-  # Keep intl for date formatting
   intl: ^0.20.2 
-
-  # 'http' package has been removed
+  url_launcher: ^6.2.2
   
   cupertino_icons: ^1.0.8
 
@@ -31,5 +25,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  
-  # (No changes needed to the rest of the file)
