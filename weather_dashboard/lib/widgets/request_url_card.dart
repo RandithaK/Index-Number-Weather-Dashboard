@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_dashboard/theme/colors.dart';
 
 class RequestUrlCard extends StatelessWidget {
   final String? requestUrl;
@@ -12,9 +13,9 @@ class RequestUrlCard extends StatelessWidget {
 
     return Card(
       elevation: 0,
-      color: isDarkMode
-          ? const Color(0xFFD1D5DB).withOpacity(0.1)
-          : const Color(0xFFDDD6FE),
+    color: isDarkMode
+      ? AppColors.darkAccent.withOpacity(0.1)
+      : AppColors.lightAccentSoft,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -24,11 +25,11 @@ class RequestUrlCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.link,
-                    size: 16,
-                    color: isDarkMode
-                        ? const Color(0xFFC4B5FD)
-                        : const Color(0xFF7C3AED)),
+                Icon(
+                  Icons.link,
+                  size: 16,
+                  color: isDarkMode ? AppColors.darkAccent : AppColors.lightAccent,
+                ),
                 const SizedBox(width: 8),
                 Text('Request URL',
                     style: TextStyle(

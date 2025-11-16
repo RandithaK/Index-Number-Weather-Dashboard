@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_dashboard/theme/colors.dart';
 
 class InputCard extends StatelessWidget {
   final TextEditingController controller;
@@ -43,9 +44,9 @@ class InputCard extends StatelessWidget {
                 hintStyle: TextStyle(
                     color: theme.textTheme.bodySmall?.color?.withOpacity(0.4)),
                 filled: true,
-                fillColor: isDarkMode
-                    ? const Color(0xFF4B5563)
-                    : const Color(0xFFE5E7EB),
+        fillColor: isDarkMode
+          ? AppColors.darkMuted
+          : AppColors.lightInputFill,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -58,9 +59,9 @@ class InputCard extends StatelessWidget {
             ElevatedButton(
               onPressed: isLoading ? null : onFetchPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDarkMode
-                    ? const Color(0xFFC4B5FD)
-                    : const Color(0xFF7C3AED),
+        backgroundColor: isDarkMode
+          ? AppColors.darkAccent
+          : AppColors.lightAccent,
                 foregroundColor: isDarkMode ? Colors.black : Colors.white,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(

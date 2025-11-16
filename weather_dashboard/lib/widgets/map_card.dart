@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_dashboard/theme/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:math';
 
@@ -66,9 +67,9 @@ class MapCard extends StatelessWidget {
               child: Container(
                 height: 200,
                 decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? const Color(0xFF1F2937)
-                      : const Color(0xFFF9FAFB),
+          color: isDarkMode
+            ? AppColors.darkCard
+            : AppColors.lightScaffold,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isDarkMode
@@ -102,9 +103,9 @@ class MapCard extends StatelessWidget {
                                                   .cumulativeBytesLoaded /
                                               loadingProgress.expectedTotalBytes!
                                           : null,
-                                      color: isDarkMode
-                                          ? const Color(0xFFC4B5FD)
-                                          : const Color(0xFF7C3AED),
+                    color: isDarkMode
+                      ? AppColors.darkAccent
+                      : AppColors.lightAccent,
                                     ),
                                   );
                                 },
@@ -192,17 +193,13 @@ class MapCard extends StatelessWidget {
                   : null,
               icon: Icon(Icons.open_in_new,
                   size: 14,
-                  color: hasCoordinates
-                      ? (isDarkMode
-                          ? const Color(0xFFC4B5FD)
-                          : const Color(0xFF7C3AED))
+          color: hasCoordinates
+            ? (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent)
                       : theme.textTheme.bodySmall?.color?.withOpacity(0.3)),
               label: Text('Open in OpenStreetMap',
                   style: TextStyle(
-                      color: hasCoordinates
-                          ? (isDarkMode
-                              ? const Color(0xFFC4B5FD)
-                              : const Color(0xFF7C3AED))
+            color: hasCoordinates
+              ? (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent)
                           : theme.textTheme.bodySmall?.color?.withOpacity(0.3),
                       fontSize: 13,
                       fontWeight: FontWeight.w500)),
@@ -239,12 +236,12 @@ class _MapFallback extends StatelessWidget {
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+    gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDarkMode
-              ? [const Color(0xFF1F2937), const Color(0xFF374151)]
-              : [const Color(0xFFE0E7FF), const Color(0xFFC7D2FE)],
+      colors: isDarkMode
+              ? [AppColors.darkCard, AppColors.darkMuted]
+              : [AppColors.lightAccentSoft.withOpacity(0.9), AppColors.lightAccentSoft],
         ),
       ),
       child: Stack(

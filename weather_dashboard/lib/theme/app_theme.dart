@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'colors.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       brightness: Brightness.light,
       primarySwatch: Colors.purple,
-      scaffoldBackgroundColor: const Color(0xFFF3F4F6),
-      cardColor: Colors.white,
+  scaffoldBackgroundColor: AppColors.lightScaffold,
+  cardColor: AppColors.lightCard,
       fontFamily: 'Inter',
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -16,7 +17,7 @@ class AppTheme {
             color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
       ),
       colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
-          .copyWith(background: const Color(0xFFF3F4F6)),
+          .copyWith(background: AppColors.lightScaffold),
     );
   }
 
@@ -24,8 +25,8 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.dark,
       primarySwatch: Colors.purple,
-      scaffoldBackgroundColor: const Color(0xFF1F2937),
-      cardColor: const Color(0xFF374151),
+  scaffoldBackgroundColor: AppColors.darkScaffold,
+  cardColor: AppColors.darkCard,
       fontFamily: 'Inter',
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -36,7 +37,7 @@ class AppTheme {
       ),
       colorScheme: ColorScheme.fromSwatch(
               primarySwatch: Colors.purple, brightness: Brightness.dark)
-          .copyWith(background: const Color(0xFF1F2937)),
+          .copyWith(background: AppColors.darkScaffold),
     );
   }
 }

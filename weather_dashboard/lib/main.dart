@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:weather_dashboard/theme/app_theme.dart';
+import 'package:weather_dashboard/theme/colors.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_dashboard/services/weather_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,39 +31,8 @@ class _WeatherAppState extends State<WeatherApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Weather Dashboard',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primarySwatch: Colors.purple,
-        scaffoldBackgroundColor: const Color(0xFFF3F4F6),
-        cardColor: Colors.white,
-        fontFamily: 'Inter',
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
-          titleTextStyle: TextStyle(
-              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
-            .copyWith(background: const Color(0xFFF3F4F6)),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.purple,
-        scaffoldBackgroundColor: const Color(0xFF1F2937),
-        cardColor: const Color(0xFF374151),
-        fontFamily: 'Inter',
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(
-              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        colorScheme: ColorScheme.fromSwatch(
-                primarySwatch: Colors.purple, brightness: Brightness.dark)
-            .copyWith(background: const Color(0xFF1F2937)),
-      ),
+  theme: AppTheme.lightTheme,
+  darkTheme: AppTheme.darkTheme,
       themeMode: _themeMode,
       home: WeatherPage(onToggleTheme: _toggleTheme),
       debugShowCheckedModeBanner: false,
@@ -231,7 +202,7 @@ class _WeatherPageState extends State<WeatherPage> {
 
   Widget _buildInputCard(ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
-    return Card(
+  return Card(
       elevation: 0,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -257,9 +228,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 hintStyle: TextStyle(
                     color: theme.textTheme.bodySmall?.color?.withOpacity(0.4)),
                 filled: true,
-                fillColor: isDarkMode
-                    ? const Color(0xFF4B5563)
-                    : const Color(0xFFE5E7EB),
+        fillColor: isDarkMode ? AppColors.darkMuted : AppColors.lightInputFill,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -272,9 +241,7 @@ class _WeatherPageState extends State<WeatherPage> {
             ElevatedButton(
               onPressed: _isLoading ? null : _onFetchWeatherPressed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDarkMode
-                    ? const Color(0xFFC4B5FD)
-                    : const Color(0xFF7C3AED),
+        backgroundColor: isDarkMode ? AppColors.darkAccent : AppColors.lightAccent,
                 foregroundColor: isDarkMode ? Colors.black : Colors.white,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
@@ -305,7 +272,7 @@ class _WeatherPageState extends State<WeatherPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
     return Card(
       elevation: 0,
-      color: isDarkMode ? const Color(0xFFD1D5DB).withOpacity(0.1) : const Color(0xFFDDD6FE),
+      color: isDarkMode ? AppColors.darkAccent.withOpacity(0.1) : AppColors.lightAccentSoft,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -315,7 +282,7 @@ class _WeatherPageState extends State<WeatherPage> {
           children: [
             Row(
               children: [
-                Icon(Icons.location_on, size: 18, color: isDarkMode ? const Color(0xFFC4B5FD) : const Color(0xFF7C3AED)),
+                Icon(Icons.location_on, size: 18, color: isDarkMode ? AppColors.darkAccent : AppColors.lightAccent),
                 const SizedBox(width: 8),
                 Text('Computed Coordinates',
                     style: TextStyle(
@@ -435,9 +402,7 @@ class _WeatherPageState extends State<WeatherPage> {
               child: Container(
                 height: 200,
                 decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? const Color(0xFF1F2937)
-                      : const Color(0xFFF9FAFB),
+                  color: isDarkMode ? AppColors.darkCard : AppColors.lightScaffold,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isDarkMode
@@ -468,9 +433,7 @@ class _WeatherPageState extends State<WeatherPage> {
                                           ? loadingProgress.cumulativeBytesLoaded /
                                               loadingProgress.expectedTotalBytes!
                                           : null,
-                                      color: isDarkMode
-                                          ? const Color(0xFFC4B5FD)
-                                          : const Color(0xFF7C3AED),
+                    color: isDarkMode ? AppColors.darkAccent : AppColors.lightAccent,
                                     ),
                                   );
                                 },
@@ -556,17 +519,13 @@ class _WeatherPageState extends State<WeatherPage> {
                   : null,
               icon: Icon(Icons.open_in_new,
                   size: 14,
-                  color: hasCoordinates
-                      ? (isDarkMode
-                          ? const Color(0xFFC4B5FD)
-                          : const Color(0xFF7C3AED))
+          color: hasCoordinates
+            ? (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent)
                       : theme.textTheme.bodySmall?.color?.withOpacity(0.3)),
               label: Text('Open in OpenStreetMap',
                   style: TextStyle(
                       color: hasCoordinates
-                          ? (isDarkMode
-                              ? const Color(0xFFC4B5FD)
-                              : const Color(0xFF7C3AED))
+              ? (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent)
                           : theme.textTheme.bodySmall?.color?.withOpacity(0.3),
                       fontSize: 13,
                       fontWeight: FontWeight.w500)),
@@ -594,9 +553,9 @@ class _WeatherPageState extends State<WeatherPage> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDarkMode
-              ? [Color(0xFF1F2937), Color(0xFF374151)]
-              : [Color(0xFFE0E7FF), Color(0xFFC7D2FE)],
+      colors: isDarkMode
+        ? [AppColors.darkCard, AppColors.darkMuted]
+        : [AppColors.lightAccentSoft.withOpacity(0.9), AppColors.lightAccentSoft],
         ),
       ),
       child: Stack(
@@ -770,7 +729,7 @@ class _WeatherPageState extends State<WeatherPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
     return Card(
       elevation: 0,
-      color: isDarkMode ? const Color(0xFFD1D5DB).withOpacity(0.1) : const Color(0xFFDDD6FE),
+  color: isDarkMode ? AppColors.darkAccent.withOpacity(0.1) : AppColors.lightAccentSoft,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -780,7 +739,7 @@ class _WeatherPageState extends State<WeatherPage> {
           children: [
             Row(
               children: [
-                Icon(Icons.link, size: 16, color: isDarkMode ? const Color(0xFFC4B5FD) : const Color(0xFF7C3AED)),
+                Icon(Icons.link, size: 16, color: isDarkMode ? AppColors.darkAccent : AppColors.lightAccent),
                 const SizedBox(width: 8),
                 Text('Request URL',
                     style: TextStyle(
