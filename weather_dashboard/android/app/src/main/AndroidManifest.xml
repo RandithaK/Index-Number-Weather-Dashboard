@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required: allow the app to access the internet on devices and release builds -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="weather_dashboard"
         android:name="${applicationName}"
