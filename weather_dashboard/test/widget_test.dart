@@ -1,6 +1,5 @@
 // This is a basic Flutter widget test for the WeatherApp.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // Import the main app file. Make sure the package name 'weather_dashboard'

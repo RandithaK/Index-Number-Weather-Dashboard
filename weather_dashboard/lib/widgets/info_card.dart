@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_dashboard/theme/colors.dart';
 
 class InfoCard extends StatelessWidget {
   final IconData icon;
@@ -8,13 +9,13 @@ class InfoCard extends StatelessWidget {
   final double valueSize;
 
   const InfoCard({
-    Key? key,
+    super.key,
     required this.icon,
     required this.iconColor,
     required this.title,
     required this.value,
     this.valueSize = 14.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class InfoCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(isDarkMode ? 0.2 : 0.1),
+                color: iconColor.withOpacityF(isDarkMode ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: iconColor, size: 20),

@@ -9,10 +9,11 @@ import 'package:weather_dashboard/widgets/error_card.dart';
 import 'package:weather_dashboard/widgets/info_card.dart';
 import 'package:weather_dashboard/widgets/request_url_card.dart';
 import 'package:weather_dashboard/widgets/footer.dart';
+import 'package:weather_dashboard/theme/colors.dart';
 
 class WeatherPage extends StatefulWidget {
   final VoidCallback onToggleTheme;
-  const WeatherPage({Key? key, required this.onToggleTheme}) : super(key: key);
+  const WeatherPage({super.key, required this.onToggleTheme});
 
   @override
   State<WeatherPage> createState() => _WeatherPageState();
@@ -65,8 +66,8 @@ class _WeatherPageState extends State<WeatherPage> {
                   style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.normal,
-                      color:
-                          theme.textTheme.bodySmall?.color?.withOpacity(0.6)),
+            color:
+              theme.textTheme.bodySmall?.color?.withOpacityF(0.6)),
                 ),
               ],
             ),
@@ -77,9 +78,9 @@ class _WeatherPageState extends State<WeatherPage> {
                   icon: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.black.withOpacity(0.05),
+            color: isDarkMode
+              ? Colors.white.withOpacityF(0.1)
+              : Colors.black.withOpacityF(0.05),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

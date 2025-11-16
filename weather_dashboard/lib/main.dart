@@ -11,7 +11,7 @@ void main() {
 }
 
 class WeatherApp extends StatefulWidget {
-  const WeatherApp({Key? key}) : super(key: key);
+  const WeatherApp({super.key});
 
   @override
   State<WeatherApp> createState() => _WeatherAppState();
@@ -42,7 +42,7 @@ class _WeatherAppState extends State<WeatherApp> {
 
 class WeatherPage extends StatefulWidget {
   final VoidCallback onToggleTheme;
-  const WeatherPage({Key? key, required this.onToggleTheme}) : super(key: key);
+  const WeatherPage({super.key, required this.onToggleTheme});
 
   @override
   State<WeatherPage> createState() => _WeatherPageState();
@@ -93,11 +93,10 @@ class _WeatherPageState extends State<WeatherPage> {
                         TextStyle(fontWeight: FontWeight.w600, fontSize: 22)),
                 Text(
                   'Enter your student index to get weather data',
-                  style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.normal,
-                      color:
-                          theme.textTheme.bodySmall?.color?.withOpacity(0.6)),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                        color: theme.textTheme.bodySmall?.color?.withOpacityF(0.6)),
                 ),
               ],
             ),
@@ -108,9 +107,9 @@ class _WeatherPageState extends State<WeatherPage> {
                   icon: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.black.withOpacity(0.05),
+            color: isDarkMode
+              ? Colors.white.withOpacityF(0.1)
+              : Colors.black.withOpacityF(0.05),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -215,9 +214,9 @@ class _WeatherPageState extends State<WeatherPage> {
                 style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.7))),
-            const SizedBox(height: 10),
-            TextField(
+                    color: theme.textTheme.bodySmall?.color?.withOpacityF(0.7))),
+        const SizedBox(height: 10),
+        TextField(
               controller: _indexController,
               style: TextStyle(
                   fontSize: 15,
@@ -225,8 +224,8 @@ class _WeatherPageState extends State<WeatherPage> {
                   fontWeight: FontWeight.w500),
               decoration: InputDecoration(
                 hintText: 'e.g., 224112A',
-                hintStyle: TextStyle(
-                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.4)),
+          hintStyle: TextStyle(
+            color: theme.textTheme.bodySmall?.color?.withOpacityF(0.4)),
                 filled: true,
         fillColor: isDarkMode ? AppColors.darkMuted : AppColors.lightInputFill,
                 border: OutlineInputBorder(
@@ -272,7 +271,7 @@ class _WeatherPageState extends State<WeatherPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
     return Card(
       elevation: 0,
-      color: isDarkMode ? AppColors.darkAccent.withOpacity(0.1) : AppColors.lightAccentSoft,
+  color: isDarkMode ? AppColors.darkAccent.withOpacityF(0.1) : AppColors.lightAccentSoft,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -308,7 +307,7 @@ class _WeatherPageState extends State<WeatherPage> {
                             style: TextStyle(
                                 fontSize: 12,
                                 color: theme.textTheme.bodySmall?.color
-                                    ?.withOpacity(0.6))),
+                                            ?.withOpacityF(0.6))),
                         const SizedBox(height: 6),
                         Text(_latitude ?? '---',
                             style: TextStyle(
@@ -334,7 +333,7 @@ class _WeatherPageState extends State<WeatherPage> {
                             style: TextStyle(
                                 fontSize: 12,
                                 color: theme.textTheme.bodySmall?.color
-                                    ?.withOpacity(0.6))),
+                                                ?.withOpacityF(0.6))),
                         const SizedBox(height: 6),
                         Text(_longitude ?? '---',
                             style: TextStyle(
@@ -406,8 +405,8 @@ class _WeatherPageState extends State<WeatherPage> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isDarkMode
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.black.withOpacity(0.05),
+                  ? Colors.white.withOpacityF(0.1)
+                        : Colors.black.withOpacityF(0.05),
                   ),
                 ),
                 child: hasCoordinates
@@ -452,7 +451,7 @@ class _WeatherPageState extends State<WeatherPage> {
                                 shadows: [
                                   Shadow(
                                     blurRadius: 4,
-                                    color: Colors.black.withOpacity(0.5),
+                                    color: Colors.black.withOpacityF(0.5),
                                   ),
                                 ],
                               ),
@@ -465,7 +464,7 @@ class _WeatherPageState extends State<WeatherPage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.7),
+                                  color: Colors.black.withOpacityF(0.7),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Row(
@@ -493,14 +492,14 @@ class _WeatherPageState extends State<WeatherPage> {
                             Icon(
                               Icons.map_outlined,
                               size: 48,
-                              color: theme.textTheme.bodySmall?.color
-                                  ?.withOpacity(0.3),
+              color: theme.textTheme.bodySmall?.color
+                ?.withOpacityF(0.3),
                             ),
                             const SizedBox(height: 8),
                             Text('Map will appear after fetching weather',
                                 style: TextStyle(
-                                    color: theme.textTheme.bodySmall?.color
-                                        ?.withOpacity(0.4),
+                    color: theme.textTheme.bodySmall?.color
+                      ?.withOpacityF(0.4),
                                     fontSize: 13)),
                           ],
                         ),
@@ -521,12 +520,12 @@ class _WeatherPageState extends State<WeatherPage> {
                   size: 14,
           color: hasCoordinates
             ? (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent)
-                      : theme.textTheme.bodySmall?.color?.withOpacity(0.3)),
+                      : theme.textTheme.bodySmall?.color?.withOpacityF(0.3)),
               label: Text('Open in OpenStreetMap',
                   style: TextStyle(
                       color: hasCoordinates
               ? (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent)
-                          : theme.textTheme.bodySmall?.color?.withOpacity(0.3),
+                          : theme.textTheme.bodySmall?.color?.withOpacityF(0.3),
                       fontSize: 13,
                       fontWeight: FontWeight.w500)),
               style: TextButton.styleFrom(
@@ -553,9 +552,9 @@ class _WeatherPageState extends State<WeatherPage> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-      colors: isDarkMode
-        ? [AppColors.darkCard, AppColors.darkMuted]
-        : [AppColors.lightAccentSoft.withOpacity(0.9), AppColors.lightAccentSoft],
+  colors: isDarkMode
+    ? [AppColors.darkCard, AppColors.darkMuted]
+    : [AppColors.lightAccentSoft.withOpacityF(0.9), AppColors.lightAccentSoft],
         ),
       ),
       child: Stack(
@@ -579,7 +578,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withOpacityF(0.7),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -596,7 +595,7 @@ class _WeatherPageState extends State<WeatherPage> {
                       Text(
                         'Tap to view full map',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withOpacityF(0.8),
                           fontSize: 11,
                         ),
                       ),
@@ -698,7 +697,7 @@ class _WeatherPageState extends State<WeatherPage> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(isDarkMode ? 0.2 : 0.1),
+                color: iconColor.withOpacityF(isDarkMode ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: iconColor, size: 20),
@@ -729,7 +728,7 @@ class _WeatherPageState extends State<WeatherPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
     return Card(
       elevation: 0,
-  color: isDarkMode ? AppColors.darkAccent.withOpacity(0.1) : AppColors.lightAccentSoft,
+  color: isDarkMode ? AppColors.darkAccent.withOpacityF(0.1) : AppColors.lightAccentSoft,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -759,7 +758,7 @@ class _WeatherPageState extends State<WeatherPage> {
               child: Text(
                 _requestUrl ?? 'Press "Fetch Weather" to generate URL',
                 style: TextStyle(
-                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                  color: theme.textTheme.bodySmall?.color?.withOpacityF(0.7),
                   fontSize: 11,
                   fontFamily: 'monospace',
                 ),
@@ -779,14 +778,14 @@ class _WeatherPageState extends State<WeatherPage> {
           Text(
             'Powered by Open-Meteo API',
             style: TextStyle(
-                color: theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+                color: theme.textTheme.bodySmall?.color?.withOpacityF(0.5),
                 fontSize: 12),
           ),
           const SizedBox(height: 4),
           Text(
             'Done by 224112A',
             style: TextStyle(
-                color: theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+                color: theme.textTheme.bodySmall?.color?.withOpacityF(0.5),
                 fontSize: 12),
           ),
         ],
@@ -888,7 +887,7 @@ class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = (isDarkMode ? Colors.white : Colors.black).withOpacity(0.1)
+  ..color = (isDarkMode ? Colors.white : Colors.black).withOpacityF(0.1)
       ..strokeWidth = 1;
 
     const spacing = 30.0;

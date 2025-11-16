@@ -7,11 +7,11 @@ class InputCard extends StatelessWidget {
   final VoidCallback onFetchPressed;
 
   const InputCard({
-    Key? key,
+    super.key,
     required this.controller,
     required this.isLoading,
     required this.onFetchPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class InputCard extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.7))),
+                    color: theme.textTheme.bodySmall?.color?.withOpacityF(0.7))),
             const SizedBox(height: 10),
             TextField(
               controller: controller,
@@ -41,8 +41,8 @@ class InputCard extends StatelessWidget {
                   fontWeight: FontWeight.w500),
               decoration: InputDecoration(
                 hintText: 'e.g., 224112A',
-                hintStyle: TextStyle(
-                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.4)),
+        hintStyle: TextStyle(
+          color: theme.textTheme.bodySmall?.color?.withOpacityF(0.4)),
                 filled: true,
         fillColor: isDarkMode
           ? AppColors.darkMuted

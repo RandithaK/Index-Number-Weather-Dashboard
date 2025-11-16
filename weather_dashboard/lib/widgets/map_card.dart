@@ -8,10 +8,10 @@ class MapCard extends StatelessWidget {
   final String? longitude;
 
   const MapCard({
-    Key? key,
+    super.key,
     this.latitude,
     this.longitude,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +72,9 @@ class MapCard extends StatelessWidget {
             : AppColors.lightScaffold,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isDarkMode
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.black.withOpacity(0.05),
+          color: isDarkMode
+            ? Colors.white.withOpacityF(0.1)
+            : Colors.black.withOpacityF(0.05),
                   ),
                 ),
                 child: hasCoordinates
@@ -126,7 +126,7 @@ class MapCard extends StatelessWidget {
                                 shadows: [
                                   Shadow(
                                     blurRadius: 4,
-                                    color: Colors.black.withOpacity(0.5),
+                                    color: Colors.black.withOpacityF(0.5),
                                   ),
                                 ],
                               ),
@@ -138,7 +138,7 @@ class MapCard extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.7),
+                                  color: Colors.black.withOpacityF(0.7),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: const Row(
@@ -166,14 +166,14 @@ class MapCard extends StatelessWidget {
                             Icon(
                               Icons.map_outlined,
                               size: 48,
-                              color: theme.textTheme.bodySmall?.color
-                                  ?.withOpacity(0.3),
+                color: theme.textTheme.bodySmall?.color
+                  ?.withOpacityF(0.3),
                             ),
                             const SizedBox(height: 8),
                             Text('Map will appear after fetching weather',
-                                style: TextStyle(
-                                    color: theme.textTheme.bodySmall?.color
-                                        ?.withOpacity(0.4),
+                  style: TextStyle(
+                  color: theme.textTheme.bodySmall?.color
+                    ?.withOpacityF(0.4),
                                     fontSize: 13)),
                           ],
                         ),
@@ -195,12 +195,12 @@ class MapCard extends StatelessWidget {
                   size: 14,
           color: hasCoordinates
             ? (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent)
-                      : theme.textTheme.bodySmall?.color?.withOpacity(0.3)),
+                      : theme.textTheme.bodySmall?.color?.withOpacityF(0.3)),
               label: Text('Open in OpenStreetMap',
                   style: TextStyle(
             color: hasCoordinates
               ? (isDarkMode ? AppColors.darkAccent : AppColors.lightAccent)
-                          : theme.textTheme.bodySmall?.color?.withOpacity(0.3),
+                          : theme.textTheme.bodySmall?.color?.withOpacityF(0.3),
                       fontSize: 13,
                       fontWeight: FontWeight.w500)),
               style: TextButton.styleFrom(
@@ -241,7 +241,7 @@ class _MapFallback extends StatelessWidget {
           end: Alignment.bottomRight,
       colors: isDarkMode
               ? [AppColors.darkCard, AppColors.darkMuted]
-              : [AppColors.lightAccentSoft.withOpacity(0.9), AppColors.lightAccentSoft],
+          : [AppColors.lightAccentSoft.withOpacityF(0.9), AppColors.lightAccentSoft],
         ),
       ),
       child: Stack(
@@ -264,7 +264,7 @@ class _MapFallback extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withOpacityF(0.7),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -281,7 +281,7 @@ class _MapFallback extends StatelessWidget {
                       Text(
                         'Tap to view full map',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withOpacityF(0.8),
                           fontSize: 11,
                         ),
                       ),
@@ -305,7 +305,7 @@ class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = (isDarkMode ? Colors.white : Colors.black).withOpacity(0.1)
+  ..color = (isDarkMode ? Colors.white : Colors.black).withOpacityF(0.1)
       ..strokeWidth = 1;
 
     const spacing = 30.0;

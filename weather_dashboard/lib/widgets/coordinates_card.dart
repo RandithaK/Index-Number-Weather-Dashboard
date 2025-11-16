@@ -6,10 +6,10 @@ class CoordinatesCard extends StatelessWidget {
   final String? longitude;
 
   const CoordinatesCard({
-    Key? key,
+    super.key,
     this.latitude,
     this.longitude,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class CoordinatesCard extends StatelessWidget {
     return Card(
       elevation: 0,
     color: isDarkMode
-      ? AppColors.darkAccent.withOpacity(0.1)
+      ? AppColors.darkAccent.withOpacityF(0.1)
       : AppColors.lightAccentSoft,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -59,8 +59,8 @@ class CoordinatesCard extends StatelessWidget {
                         Text('Latitude',
                             style: TextStyle(
                                 fontSize: 12,
-                                color: theme.textTheme.bodySmall?.color
-                                    ?.withOpacity(0.6))),
+                color: theme.textTheme.bodySmall?.color
+                  ?.withOpacityF(0.6))),
                         const SizedBox(height: 6),
                         Text(latitude ?? '---',
                             style: TextStyle(
@@ -85,8 +85,8 @@ class CoordinatesCard extends StatelessWidget {
                         Text('Longitude',
                             style: TextStyle(
                                 fontSize: 12,
-                                color: theme.textTheme.bodySmall?.color
-                                    ?.withOpacity(0.6))),
+                color: theme.textTheme.bodySmall?.color
+                  ?.withOpacityF(0.6))),
                         const SizedBox(height: 6),
                         Text(longitude ?? '---',
                             style: TextStyle(

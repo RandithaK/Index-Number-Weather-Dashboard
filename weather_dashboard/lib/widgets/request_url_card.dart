@@ -4,7 +4,7 @@ import 'package:weather_dashboard/theme/colors.dart';
 class RequestUrlCard extends StatelessWidget {
   final String? requestUrl;
 
-  const RequestUrlCard({Key? key, this.requestUrl}) : super(key: key);
+  const RequestUrlCard({super.key, this.requestUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class RequestUrlCard extends StatelessWidget {
     return Card(
       elevation: 0,
     color: isDarkMode
-      ? AppColors.darkAccent.withOpacity(0.1)
+      ? AppColors.darkAccent.withOpacityF(0.1)
       : AppColors.lightAccentSoft,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -49,7 +49,7 @@ class RequestUrlCard extends StatelessWidget {
               child: Text(
                 requestUrl ?? 'Press "Fetch Weather" to generate URL',
                 style: TextStyle(
-                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                  color: theme.textTheme.bodySmall?.color?.withOpacityF(0.7),
                   fontSize: 11,
                   fontFamily: 'monospace',
                 ),

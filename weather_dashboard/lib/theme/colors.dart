@@ -20,3 +20,10 @@ class AppColors {
   static const Color warningLight = Color(0xFFFDE68A);
   static const Color warningDark = Color(0xFFFBBF24);
 }
+
+// Small extension helpers used to avoid deprecated .withOpacity
+extension AppColorHelpers on Color {
+  /// Use integer alpha to avoid precision loss. Prefer this instead of
+  /// `withOpacity` which is shown deprecating messages in analyzer.
+  Color withOpacityF(double opacity) => withAlpha((opacity * 255).round());
+}

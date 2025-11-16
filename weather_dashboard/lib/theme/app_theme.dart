@@ -16,8 +16,8 @@ class AppTheme {
         titleTextStyle: TextStyle(
             color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
-          .copyWith(background: AppColors.lightScaffold),
+    colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
+      .copyWith(surface: AppColors.lightScaffold),
     );
   }
 
@@ -35,9 +35,9 @@ class AppTheme {
         titleTextStyle: TextStyle(
             color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      colorScheme: ColorScheme.fromSwatch(
-              primarySwatch: Colors.purple, brightness: Brightness.dark)
-          .copyWith(background: AppColors.darkScaffold),
+    colorScheme: ColorScheme.fromSwatch(
+        primarySwatch: Colors.purple, brightness: Brightness.dark)
+      .copyWith(surface: AppColors.darkScaffold),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weather_dashboard/theme/colors.dart';
 
 class OfflineBanner extends StatelessWidget {
-  const OfflineBanner({Key? key}) : super(key: key);
+  const OfflineBanner({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +11,7 @@ class OfflineBanner extends StatelessWidget {
 
     return Card(
       elevation: 0,
-  color: isDarkMode ? AppColors.warningDark.withOpacity(0.14) : AppColors.warningLight,
+  color: isDarkMode ? AppColors.warningDark.withOpacityF(0.14) : AppColors.warningLight,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
