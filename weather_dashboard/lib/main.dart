@@ -80,7 +80,7 @@ class WeatherPage extends StatefulWidget {
 class _WeatherPageState extends State<WeatherPage> {
   // Controller for the text field
   final TextEditingController _indexController =
-      TextEditingController(text: '194174B');
+      TextEditingController(text: '224112A');
 
   // --- Weather Service ---
   final WeatherService _weatherService = WeatherService();
@@ -246,7 +246,7 @@ class _WeatherPageState extends State<WeatherPage> {
             TextField(
               controller: _indexController,
               decoration: InputDecoration(
-                hintText: 'e.g., 194174B',
+                hintText: 'e.g., 224112A',
                 filled: true,
                 fillColor: theme.colorScheme.background,
                 border: OutlineInputBorder(
