@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // For date formatting
+import 'package:weather_dashboard/weather_service.dart'; // Import our new service
 
 // --- App Entry Point ---
 void main() {
@@ -36,7 +38,8 @@ class _WeatherAppState extends State<WeatherApp> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.black),
-          titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+          titleTextStyle: TextStyle(
+              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
             .copyWith(background: const Color(0xFFF9FAFB)),
@@ -51,9 +54,11 @@ class _WeatherAppState extends State<WeatherApp> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          titleTextStyle: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple, brightness: Brightness.dark)
+        colorScheme: ColorScheme.fromSwatch(
+                primarySwatch: Colors.purple, brightness: Brightness.dark)
             .copyWith(background: const Color(0xFF111827)),
       ),
       themeMode: _themeMode,
@@ -77,19 +82,23 @@ class _WeatherPageState extends State<WeatherPage> {
   final TextEditingController _indexController =
       TextEditingController(text: '194174B');
 
-  // --- Placeholder Data (from your mockup) ---
+  // --- Weather Service ---
+  final WeatherService _weatherService = WeatherService();
+
+  // --- State Variables ---
   String? _studentIndex;
   String? _latitude;
   String? _longitude;
-  final String _temperature = '27.1°C'; // Stays as placeholder
-  final String _windSpeed = '14.9 km/h'; // Stays as placeholder
-  final String _weatherCode = '95'; // Stays as placeholder
-  final String _lastUpdated = '11/16/2025, 2:55:20 AM'; // Stays as placeholder
+  String? _temperature;
+  String? _windSpeed;
+  String? _weatherCode;
+  String? _lastUpdated;
   String? _requestUrl;
 
   // State for the UI
-  bool _isOffline = false; // To show the cached data banner
-  String? _errorMessage; // For error handling
+  bool _isLoading = false; // For loading indicator
+  bool _isOffline = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -113,16 +122,23 @@ class _WeatherPageState extends State<WeatherPage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Weather Lookup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                const Text('Weather Lookup',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
                 Text(
                   'Enter your student index to get weather data',
-                  style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color?.withOpacity(0.7)),
+                  style: TextStyle(
+                      fontSize: 14,
+                      color:
+                          theme.textTheme.bodySmall?.color?.withOpacity(0.7)),
                 ),
               ],
             ),
             actions: [
               IconButton(
-                icon: Icon(isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
+                icon: Icon(isDarkMode
+                    ? Icons.light_mode_rounded
+                    : Icons.dark_mode_rounded),
                 onPressed: widget.onToggleTheme,
                 tooltip: 'Toggle Theme',
               ),
@@ -150,11 +166,9 @@ class _WeatherPageState extends State<WeatherPage> {
                   // 3. Map Placeholder
                   _buildMapPlaceholder(theme),
                   const SizedBox(height: 16),
-                  
+
                   // 4. Offline Banner (conditionally shown)
-                  if (_isOffline)
-                    _buildOfflineBanner(theme),
-                  if (_isOffline)
+                  if (_isOffline) _buildOfflineBanner(theme),
                   if (_isOffline) const SizedBox(height: 16),
 
                   // 5. Weather Results
@@ -171,7 +185,7 @@ class _WeatherPageState extends State<WeatherPage> {
                     icon: Icons.thermostat_rounded,
                     iconColor: Colors.red,
                     title: 'Temperature',
-                    value: _temperature,
+                    value: _temperature ?? '---',
                   ),
                   const SizedBox(height: 12),
                   _buildInfoCard(
@@ -179,7 +193,7 @@ class _WeatherPageState extends State<WeatherPage> {
                     icon: Icons.wind_power_rounded,
                     iconColor: Colors.blue,
                     title: 'Wind Speed',
-                    value: _windSpeed,
+                    value: _windSpeed ?? '---',
                   ),
                   const SizedBox(height: 12),
                   _buildInfoCard(
@@ -187,7 +201,7 @@ class _WeatherPageState extends State<WeatherPage> {
                     icon: Icons.cloud_rounded,
                     iconColor: Colors.grey,
                     title: 'Weather Code',
-                    value: _weatherCode,
+                    value: _weatherCode ?? '---',
                   ),
                   const SizedBox(height: 12),
                   _buildInfoCard(
@@ -195,7 +209,7 @@ class _WeatherPageState extends State<WeatherPage> {
                     icon: Icons.access_time_filled_rounded,
                     iconColor: Colors.grey,
                     title: 'Last Updated',
-                    value: _lastUpdated,
+                    value: _lastUpdated ?? '---',
                     valueSize: 14.0,
                   ),
                   const SizedBox(height: 16),
@@ -203,7 +217,7 @@ class _WeatherPageState extends State<WeatherPage> {
                   // 6. Request URL
                   _buildRequestUrlCard(theme),
                   const SizedBox(height: 24),
-                  
+
                   // Footer
                   _buildFooter(theme),
                 ],
@@ -239,22 +253,33 @@ class _WeatherPageState extends State<WeatherPage> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: _onFetchWeatherPressed,
+              onPressed: _isLoading ? null : _onFetchWeatherPressed, // Disable button when loading
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.primaryColor,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
+                foregroundColor: Colors.white, // Added for better dark mode contrast
+                minimumSize: const Size(double.infinity, 48), // Added minimum size
+                shape: RoundedRectangleBorder( // Added shape
                   borderRadius: BorderRadius.circular(8),
                 ),
                 elevation: 2,
               ),
-              child: const Text('Fetch Weather', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 3,
+                      ),
+                    )
+                  : const Text('Fetch Weather',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -276,7 +301,9 @@ class _WeatherPageState extends State<WeatherPage> {
               children: [
                 Icon(Icons.map_rounded, size: 16, color: theme.primaryColor),
                 const SizedBox(width: 8),
-                Text('Computed Coordinates', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text('Computed Coordinates',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
               ],
             ),
             const SizedBox(height: 12),
@@ -337,7 +364,9 @@ class _WeatherPageState extends State<WeatherPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Location on Map', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text('Location on Map',
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             Container(
               height: 150,
@@ -346,14 +375,21 @@ class _WeatherPageState extends State<WeatherPage> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
-                child: Text('Map Placeholder', style: TextStyle(color: theme.textTheme.bodySmall?.color?.withOpacity(0.5))),
+                child: Text('Map Placeholder',
+                    style: TextStyle(
+                        color: theme.textTheme.bodySmall?.color
+                            ?.withOpacity(0.5))),
               ),
             ),
             const SizedBox(height: 8),
             TextButton.icon(
-              onPressed: () {},
-              icon: Icon(Icons.open_in_new_rounded, size: 16, color: theme.primaryColor),
-              label: Text('Open in OpenStreetMap', style: TextStyle(color: theme.primaryColor)),
+              onPressed: () {
+                // TODO: Implement URL Launcher if you have time
+              },
+              icon: Icon(Icons.open_in_new_rounded,
+                  size: 16, color: theme.primaryColor),
+              label: Text('Open in OpenStreetMap',
+                  style: TextStyle(color: theme.primaryColor)),
             ),
           ],
         ),
@@ -378,7 +414,8 @@ class _WeatherPageState extends State<WeatherPage> {
             const SizedBox(width: 12),
             Text(
               'Showing cached data (offline)',
-              style: TextStyle(color: Colors.yellow.shade900, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.yellow.shade900, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -432,7 +469,9 @@ class _WeatherPageState extends State<WeatherPage> {
           children: [
             Icon(icon, color: iconColor, size: 20),
             const SizedBox(width: 12),
-            Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500)),
+            Text(title,
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w500)),
             const Spacer(),
             Text(
               value,
@@ -460,9 +499,12 @@ class _WeatherPageState extends State<WeatherPage> {
           children: [
             Row(
               children: [
-                Icon(Icons.link_rounded, size: 16, color: theme.primaryColor),
+                Icon(Icons.link_rounded,
+                    size: 16, color: theme.primaryColor),
                 const SizedBox(width: 8),
-                Text('Request URL', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text('Request URL',
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
               ],
             ),
             const SizedBox(height: 12),
@@ -495,22 +537,27 @@ class _WeatherPageState extends State<WeatherPage> {
         children: [
           Text(
             'Powered by Open-Meteo API',
-            style: TextStyle(color: theme.textTheme.bodySmall?.color?.withOpacity(0.5), fontSize: 12),
+            style: TextStyle(
+                color: theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+                fontSize: 12),
           ),
           const SizedBox(height: 4),
           Text(
-            'Done by ${(_studentIndex ?? '194174B').replaceAll(RegExp(r'[^0-9]'), '')}',
+            // Show the index from the state, fallback to placeholder
+            'Done by ${(_studentIndex ?? _indexController.text).replaceAll(RegExp(r'[^0-9]'), '')}',
             style: TextStyle(
                 color: theme.textTheme.bodySmall?.color?.withOpacity(0.5),
-                fontSize: 12),)]
+                fontSize: 12),
+          ),
+        ],
       ),
     );
   }
 
   // --- Logic Methods ---
 
-  /// This is the core logic for Milestone 2.
-  void _onFetchWeatherPressed() {
+  /// This is the core logic for Milestones 3, 4, and 5.
+  Future<void> _onFetchWeatherPressed() async {
     final String index = _indexController.text;
     if (index.length < 4) {
       setState(() {
@@ -523,35 +570,82 @@ class _WeatherPageState extends State<WeatherPage> {
       return;
     }
 
+    // 1. Set Loading State
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _isOffline = false; // Reset offline status
+    });
+
     try {
-      // 1. Get firstTwo and nextTwo from index
+      // 2. Core Logic (Derive Coords)
       final int firstTwo = int.parse(index.substring(0, 2));
       final int nextTwo = int.parse(index.substring(2, 4));
-
-      // 2. Derive coordinates (as per assignment spec)
       final double lat = 5 + (firstTwo / 10.0);
       final double lon = 79 + (nextTwo / 10.0);
-
-      // 3. Build the request URL
       final String url =
           'https://api.open-meteo.com/v1/forecast?latitude=${lat.toStringAsFixed(2)}&longitude=${lon.toStringAsFixed(2)}&current_weather=true&temperature_unit=celsius&wind_speed_unit=kmh&current=temperature_2m,wind_speed_10m,weather_code';
 
-      // 4. Update the state
+      // 3. API Call
+      final WeatherData data = await _weatherService.fetchWeather(
+        index: index,
+        lat: lat,
+        lon: lon,
+        url: url,
+      );
+
+      // 4. Success (Online) - Format and update state
+      final String formattedTime =
+          DateFormat('M/d/yyyy, h:mm:ss a').format(data.lastUpdated);
+
       setState(() {
-        _latitude = '${lat.toStringAsFixed(2)}°';
-        _longitude = '${lon.toStringAsFixed(2)}°';
-        _requestUrl = url;
-        _studentIndex = index;
-        _errorMessage = null; // Clear any previous error
+        _studentIndex = data.index;
+        _latitude = '${data.latitude.toStringAsFixed(2)}°';
+        _longitude = '${data.longitude.toStringAsFixed(2)}°';
+        _requestUrl = data.requestUrl;
+        _temperature = '${data.temperature}°C';
+        _windSpeed = '${data.windSpeed} km/h';
+        _weatherCode = data.weatherCode.toString();
+        _lastUpdated = formattedTime;
+        _isOffline = false; // We are online
       });
     } catch (e) {
-      // Handle parsing errors (e.g., "AB" in index)
+      // 5. Error (Handle Offline/Failure)
+      final String message = e.toString().replaceFirst("Exception: ", "");
+
+      // Try to load cached data
+      final WeatherData? cached = await _weatherService.loadWeatherFromCache();
+      if (cached != null) {
+        final String formattedTime =
+            DateFormat('M/d/yyyy, h:mm:ss a').format(cached.lastUpdated);
+        setState(() {
+          _isOffline = true;
+          _studentIndex = cached.index;
+          _latitude = '${cached.latitude.toStringAsFixed(2)}°';
+          _longitude = '${cached.longitude.toStringAsFixed(2)}°';
+          _requestUrl = cached.requestUrl;
+          _temperature = '${cached.temperature}°C';
+          _windSpeed = '${cached.windSpeed} km/h';
+          _weatherCode = cached.weatherCode.toString();
+          _lastUpdated = formattedTime;
+          _errorMessage = null; // clear API error because we are showing cached data
+        });
+      } else {
+        // No cache available, show the network error
+        setState(() {
+          _errorMessage = message;
+          // Clear old data for clarity
+          _temperature = '---';
+          _windSpeed = '---';
+          _weatherCode = '---';
+          _lastUpdated = '---';
+          _isOffline = false;
+        });
+      }
+    } finally {
+      // 8. Clean up
       setState(() {
-        _errorMessage = 'Invalid Index: First 4 characters must be numbers.';
-        _latitude = null;
-        _longitude = null;
-        _requestUrl = null;
-        _studentIndex = null;
+        _isLoading = false;
       });
     }
   }
