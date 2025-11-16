@@ -176,10 +176,15 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   Future<void> _onFetchWeatherPressed() async {
-    final String index = _indexController.text;
-    if (index.length < 4) {
+    final String rawIndex = _indexController.text;
+    final String index = rawIndex.trim().toUpperCase();
+
+    // Enforce index format strictly: 6 digits followed by a single ASCII letter
+      final RegExp indexPattern = RegExp(r'^\d{6}[A-Za-z]$');
+    if (!indexPattern.hasMatch(index)) {
       setState(() {
-        _errorMessage = 'Invalid Index: Must be at least 4 characters.';
+        _errorMessage =
+            'Invalid Index: Must be 6 digits followed by a letter (e.g., 224112A).';
         _latitude = null;
         _longitude = null;
         _requestUrl = null;

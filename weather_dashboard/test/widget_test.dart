@@ -162,9 +162,50 @@ void main() {
       await tester.tap(fetchButton);
       await tester.pump();
 
-      // Should show error message
-      expect(find.text('Invalid Index: Must be at least 4 characters.'),
+    // Should show error message
+    expect(find.text('Invalid Index: Must be 6 digits followed by a letter (e.g., 224112A).'),
           findsOneWidget);
+    });
+
+    testWidgets('Shows error for various invalid formats',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const WeatherApp());
+
+      final textField = find.byType(TextField);
+      final fetchButton = find.widgetWithText(ElevatedButton, 'Fetch Weather');
+
+      final invalids = [
+        'abcdef', // letters only
+        '224112AA', // two letters at end
+        '123456', // missing trailing letter
+        '12345A6', // letter in middle
+      ];
+
+      for (final inv in invalids) {
+        await tester.enterText(textField, inv);
+        await tester.pump();
+
+        await tester.tap(fetchButton);
+        await tester.pump();
+
+        expect(find.text('Invalid Index: Must be 6 digits followed by a letter (e.g., 224112A).'), findsOneWidget);
+      }
+    });
+
+    testWidgets('Allows valid indexes (including lowercase and trimmed)',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const WeatherApp());
+
+      final textField = find.byType(TextField);
+
+      // Valid formats should not show the invalid message
+      final valids = ['224112A', '224112a', ' 224112A '];
+      for (final v in valids) {
+        await tester.enterText(textField, v);
+        await tester.pump();
+
+        expect(find.text('Invalid Index: Must be 6 digits followed by a letter (e.g., 224112A).'), findsNothing);
+      }
     });
   });
 
