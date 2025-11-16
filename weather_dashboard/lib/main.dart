@@ -1,122 +1,473 @@
 import 'package:flutter/material.dart';
 
+// --- App Entry Point ---
 void main() {
-  runApp(const MyApp());
+  runApp(const WeatherApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class WeatherApp extends StatefulWidget {
+  const WeatherApp({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<WeatherApp> createState() => _WeatherAppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _WeatherAppState extends State<WeatherApp> {
+  ThemeMode _themeMode = ThemeMode.system;
 
-  void _incrementCounter() {
+  void _toggleTheme() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _themeMode =
+          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    return MaterialApp(
+      title: 'Weather Dashboard',
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.purple,
+        scaffoldBackgroundColor: const Color(0xFFF9FAFB), // Light background
+        cardColor: Colors.white,
+        fontFamily: 'Inter', // Assumes you've added Inter font
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black),
+          titleTextStyle: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
+            .copyWith(background: const Color(0xFFF9FAFB)),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.purple,
+        scaffoldBackgroundColor: const Color(0xFF111827), // Dark background
+        cardColor: const Color(0xFF1F2937), // Dark card
+        fontFamily: 'Inter',
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple, brightness: Brightness.dark)
+            .copyWith(background: const Color(0xFF111827)),
+      ),
+      themeMode: _themeMode,
+      home: WeatherPage(onToggleTheme: _toggleTheme),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+// --- Main Weather Page UI ---
+class WeatherPage extends StatefulWidget {
+  final VoidCallback onToggleTheme;
+  const WeatherPage({Key? key, required this.onToggleTheme}) : super(key: key);
+
+  @override
+  State<WeatherPage> createState() => _WeatherPageState();
+}
+
+class _WeatherPageState extends State<WeatherPage> {
+  // Controller for the text field
+  final TextEditingController _indexController = TextEditingController(text: '194174B');
+
+  // --- Placeholder Data (from your mockup) ---
+  final String _studentIndex = '194174B';
+  final String _latitude = '6.90°';
+  final String _longitude = '83.10°';
+  final String _temperature = '27.1°C';
+  final String _windSpeed = '14.9 km/h';
+  final String _weatherCode = '95';
+  final String _lastUpdated = '11/16/2025, 2:55:20 AM';
+  final String _requestUrl =
+      'https://api.open-meteo.com/v1/forecast?latitude=6.90&longitude=83.10...';
+  
+  // State for the UI
+  bool _isOffline = false; // To show the cached data banner
+
+  @override
+  void dispose() {
+    _indexController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    return Scaffold(
+      // Use CustomScrollView to avoid overflow and get a nice scroll
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: theme.scaffoldBackgroundColor,
+            elevation: 0,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Weather Lookup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                Text(
+                  'Enter your student index to get weather data',
+                  style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color?.withOpacity(0.7)),
+                ),
+              ],
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
+                onPressed: widget.onToggleTheme,
+                tooltip: 'Toggle Theme',
+              ),
+            ],
+          ),
+          // Main content area
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate.fixed(
+                [
+                  // 1. Input Card
+                  _buildInputCard(theme),
+                  const SizedBox(height: 16),
+
+                  // 2. Computed Coordinates Card
+                  _buildCoordinatesCard(theme),
+                  const SizedBox(height: 16),
+
+                  // 3. Map Placeholder
+                  _buildMapPlaceholder(theme),
+                  const SizedBox(height: 16),
+                  
+                  // 4. Offline Banner (conditionally shown)
+                  if (_isOffline)
+                    _buildOfflineBanner(theme),
+                  if (_isOffline)
+                    const SizedBox(height: 16),
+
+                  // 5. Weather Results
+                  _buildInfoCard(
+                    theme: theme,
+                    icon: Icons.person_search_rounded,
+                    iconColor: Colors.grey,
+                    title: 'Student Index',
+                    value: _studentIndex,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfoCard(
+                    theme: theme,
+                    icon: Icons.thermostat_rounded,
+                    iconColor: Colors.red,
+                    title: 'Temperature',
+                    value: _temperature,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfoCard(
+                    theme: theme,
+                    icon: Icons.wind_power_rounded,
+                    iconColor: Colors.blue,
+                    title: 'Wind Speed',
+                    value: _windSpeed,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfoCard(
+                    theme: theme,
+                    icon: Icons.cloud_rounded,
+                    iconColor: Colors.grey,
+                    title: 'Weather Code',
+                    value: _weatherCode,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildInfoCard(
+                    theme: theme,
+                    icon: Icons.access_time_filled_rounded,
+                    iconColor: Colors.grey,
+                    title: 'Last Updated',
+                    value: _lastUpdated,
+                    valueSize: 14.0,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 6. Request URL
+                  _buildRequestUrlCard(theme),
+                  const SizedBox(height: 24),
+                  
+                  // Footer
+                  _buildFooter(theme),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Widget Builder Methods ---
+
+  Widget _buildInputCard(ThemeData theme) {
+    return Card(
+      elevation: 1,
+      shadowColor: Colors.black.withOpacity(0.05),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Student Index', style: theme.textTheme.labelMedium),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _indexController,
+              decoration: InputDecoration(
+                hintText: 'e.g., 194174B',
+                filled: true,
+                fillColor: theme.colorScheme.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () {
+                // Logic for Milestone 2 will go here
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.primaryColor,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                elevation: 2,
+              ),
+              child: const Text('Fetch Weather', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  Widget _buildCoordinatesCard(ThemeData theme) {
+    return Card(
+      elevation: 1,
+      shadowColor: Colors.black.withOpacity(0.05),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.map_rounded, size: 16, color: theme.primaryColor),
+                const SizedBox(width: 8),
+                Text('Computed Coordinates', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.background,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Text('Latitude', style: theme.textTheme.labelSmall),
+                        const SizedBox(height: 4),
+                        Text(_latitude, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.background,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Text('Longitude', style: theme.textTheme.labelSmall),
+                        const SizedBox(height: 4),
+                        Text(_longitude, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMapPlaceholder(ThemeData theme) {
+    return Card(
+      elevation: 1,
+      shadowColor: Colors.black.withOpacity(0.05),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Location on Map', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Container(
+              height: 150,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.background,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text('Map Placeholder', style: TextStyle(color: theme.textTheme.bodySmall?.color?.withOpacity(0.5))),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: () {},
+              icon: Icon(Icons.open_in_new_rounded, size: 16, color: theme.primaryColor),
+              label: Text('Open in OpenStreetMap', style: TextStyle(color: theme.primaryColor)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOfflineBanner(ThemeData theme) {
+    return Card(
+      elevation: 1,
+      color: Colors.yellow.shade100,
+      shadowColor: Colors.black.withOpacity(0.05),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.yellow.shade700, width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.yellow.shade800),
+            const SizedBox(width: 12),
+            Text(
+              'Showing cached data (offline)',
+              style: TextStyle(color: Colors.yellow.shade900, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required ThemeData theme,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String value,
+    double valueSize = 16.0,
+  }) {
+    return Card(
+      elevation: 1,
+      shadowColor: Colors.black.withOpacity(0.05),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Row(
+          children: [
+            Icon(icon, color: iconColor, size: 20),
+            const SizedBox(width: 12),
+            Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500)),
+            const Spacer(),
+            Text(
+              value,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: valueSize,
+                color: theme.textTheme.bodySmall?.color?.withOpacity(0.9),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRequestUrlCard(ThemeData theme) {
+    return Card(
+      elevation: 1,
+      shadowColor: Colors.black.withOpacity(0.05),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.link_rounded, size: 16, color: theme.primaryColor),
+                const SizedBox(width: 8),
+                Text('Request URL', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.background,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                _requestUrl,
+                style: TextStyle(
+                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooter(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        children: [
+          Text(
+            'Powered by Open-Meteo API',
+            style: TextStyle(color: theme.textTheme.bodySmall?.color?.withOpacity(0.5), fontSize: 12),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Done by ${_studentIndex.replaceAll(RegExp(r'[^0-9]'), '')}',
+            style: TextStyle(color: theme.textTheme.bodySmall?.color?.withOpacity(0.5), fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 }
