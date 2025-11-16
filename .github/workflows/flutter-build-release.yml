@@ -1,0 +1,71 @@
+name: Build Flutter APK and publish Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build-and-release:
+    name: Build APKs and create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: weather_dashboard
+
+      - name: Build split-per-abi APKs (release)
+        run: flutter build apk --split-per-abi --release
+        working-directory: weather_dashboard
+
+      - name: List generated APKs
+        run: |
+          echo "APK output files:"
+          ls -la build/app/outputs/flutter-apk || true
+        working-directory: weather_dashboard
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: build-${{ github.run_number }}
+          release_name: Flutter build ${{ github.run_number }} (commit ${{ github.sha }})
+          draft: false
+          prerelease: false
+
+      - name: Upload APKs to Release
+        if: steps.create_release.outputs.upload_url != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
+        run: |
+          set -euo pipefail
+          # Strip template portion from upload_url ("{?name,label}")
+          base_url="${UPLOAD_URL%%\{*}"
+          echo "Uploading APKs from weather_dashboard/build/app/outputs/flutter-apk"
+          shopt -s nullglob
+          files=(weather_dashboard/build/app/outputs/flutter-apk/*.apk)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No APK files found, skipping upload."
+            exit 0
+          fi
+          for f in "${files[@]}"; do
+            name=$(basename "$f")
+            echo "Uploading $name"
+            curl --fail -s -X POST \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Content-Type: application/vnd.android.package-archive" \
+              --data-binary @"$f" "${base_url}?name=${name}"
+            echo "Uploaded $name"
+          done
