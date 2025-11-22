@@ -1,5 +1,11 @@
 name: Build Flutter APK and publish Release
 
+# Ensure the GITHUB_TOKEN has enough permissions to create releases and upload assets.
+# By default the token is granted read-only access to repository contents — creating
+# a release requires write permission for contents.
+permissions:
+  contents: write
+
 on:
   push:
     branches: [ main ]
